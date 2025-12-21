@@ -16,7 +16,7 @@ class TestCLI:
         """Test parser creation."""
         parser = create_parser()
         assert isinstance(parser, argparse.ArgumentParser)
-        assert parser.prog == "imagefixer"
+        assert parser.prog == "imgop"
 
     def test_parser_required_args(self):
         """Test parser with required arguments."""

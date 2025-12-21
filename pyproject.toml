@@ -44,7 +44,7 @@ Repository = "https://github.com/mikeh74/image_sizer"
 Issues = "https://github.com/mikeh74/image_sizer/issues"
 
 [project.scripts]
-imagefixer = "imagefixer.cli:main"
+imgop = "imagefixer.cli:main"
 
 [tool.hatch.version]
 path = "src/imagefixer/__init__.py"

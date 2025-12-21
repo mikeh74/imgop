@@ -38,19 +38,19 @@ pip install imagefixer
 
 ```bash
 # Process a single image
-imagefixer image.jpg
+imgop image.jpg
 
 # Process all images in a directory
-imagefixer /path/to/images/
+imgop /path/to/images/
 
 # Specify output directory
-imagefixer image.jpg -o /output/directory/
+imgop image.jpg -o /output/directory/
 
 # Custom quality settings
-imagefixer image.jpg -q 95 -t 80
+imgop image.jpg -q 95 -t 80
 
 # Show help
-imagefixer --help
+imgop --help
 ```
 
 ### Python API

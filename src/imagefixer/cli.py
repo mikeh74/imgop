@@ -30,21 +30,21 @@ def validate_aspect_ratio(ctx, param, value):
 
 
 @click.command(
-    name="imagefixer",
+    name="imgop",
     help="Resize and crop images with flexible options",
     epilog="""
 Examples:
-  imagefixer image.jpg                              # Process single image (default mode)
-  imagefixer /path/to/images/                       # Process directory
-  imagefixer image.jpg -o /output/                  # Specify output directory
-  imagefixer image.jpg --scale 50                   # Scale to 50% of original size
-  imagefixer image.jpg --width 800                  # Resize to width 800px (auto height)
-  imagefixer image.jpg --size 1920 1080             # Resize to specific width and height
-  imagefixer image.jpg --crop-size 800 600          # Crop to 800x600 from center
-  imagefixer image.jpg --crop-aspect 16:9           # Crop to 16:9 aspect ratio
-  imagefixer image.jpg --format webp                # Convert to WebP format
-  imagefixer image.jpg --bw                         # Convert to black and white
-  imagefixer image.jpg --scale 150 --format png     # Scale to 150% and save as PNG
+  imgop image.jpg                              # Process single image (default mode)
+  imgop /path/to/images/                       # Process directory
+  imgop image.jpg -o /output/                  # Specify output directory
+  imgop image.jpg --scale 50                   # Scale to 50% of original size
+  imgop image.jpg --width 800                  # Resize to width 800px (auto height)
+  imgop image.jpg --size 1920 1080             # Resize to specific width and height
+  imgop image.jpg --crop-size 800 600          # Crop to 800x600 from center
+  imgop image.jpg --crop-aspect 16:9           # Crop to 16:9 aspect ratio
+  imgop image.jpg --format webp                # Convert to WebP format
+  imgop image.jpg --bw                         # Convert to black and white
+  imgop image.jpg --scale 150 --format png     # Scale to 150% and save as PNG
 """,
 )
 @click.argument("path", type=click.Path(exists=True))
@@ -125,7 +125,7 @@ Examples:
     default=False,
     help="Convert image to black and white (grayscale)",
 )
-@click.version_option(version="0.1.0", prog_name="imagefixer")
+@click.version_option(version="0.1.0", prog_name="imgop")
 def main(
     path,
     output,
