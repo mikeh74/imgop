@@ -1,4 +1,4 @@
-"""Command line interface for imagefixer."""
+"""Command line interface for imgop."""
 
 import sys
 

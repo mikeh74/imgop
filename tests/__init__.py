@@ -1,1 +1,1 @@
-"""Tests for imagefixer package."""
+"""Tests for imgop package."""

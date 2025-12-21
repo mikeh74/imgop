@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "imagefixer"
+name = "imgop"
 dynamic = ["version"]
 description = "Python utility to resize images and create thumbnails"
 readme = "README.md"
@@ -44,10 +44,10 @@ Repository = "https://github.com/mikeh74/image_sizer"
 Issues = "https://github.com/mikeh74/image_sizer/issues"
 
 [project.scripts]
-imgop = "imagefixer.cli:main"
+imgop = "imgop.cli:main"
 
 [tool.hatch.version]
-path = "src/imagefixer/__init__.py"
+path = "src/imgop/__init__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -57,7 +57,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/imagefixer"]
+packages = ["src/imgop"]
 
 [tool.ruff]
 # Same as Black.
@@ -127,14 +127,14 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 
 [tool.ruff.lint.isort]
-known-first-party = ["imagefixer"]
+known-first-party = ["imgop"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "--verbose --cov=imagefixer --cov-report=term-missing"
+addopts = "--verbose --cov=imgop --cov-report=term-missing"
 
 [tool.bandit]
 exclude_dirs = ["tests"]

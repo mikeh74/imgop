@@ -6,7 +6,7 @@ import tempfile
 import pytest
 from PIL import Image
 
-from imagefixer.core import ImageProcessor
+from imgop.core import ImageProcessor
 
 
 class TestImageProcessor:

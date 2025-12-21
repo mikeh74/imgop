@@ -29,7 +29,7 @@ pip install .
 ### Using pip (when published)
 
 ```bash
-pip install imagefixer
+pip install imgop
 ```
 
 ## Usage
@@ -56,7 +56,7 @@ imgop --help
 ### Python API
 
 ```python
-from imagefixer import ImageProcessor
+from imgop import ImageProcessor
 
 # Create processor with default settings
 processor = ImageProcessor()

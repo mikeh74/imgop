@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from imagefixer.cli import create_parser, main, validate_args
+from imgop.cli import create_parser, main, validate_args
 
 
 class TestCLI:
