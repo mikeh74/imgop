@@ -20,6 +20,7 @@ class ImageProcessor:
         crop_size: tuple[int, int] | None = None,
         crop_aspect: str | None = None,
         output_format: str | None = None,
+        black_and_white: bool = False,
         default_mode: bool = True,
     ):
         """Initialize ImageProcessor with quality and transformation settings.
@@ -34,6 +35,7 @@ class ImageProcessor:
             crop_size: Crop to (width, height) from center
             crop_aspect: Crop to aspect ratio (e.g., "16:9")
             output_format: Output format (jpeg, png, webp)
+            black_and_white: Convert image to grayscale
             default_mode: Whether to use default thumbnail/resize behavior
         """
         self.quality = quality
@@ -45,6 +47,7 @@ class ImageProcessor:
         self.crop_size = tuple(crop_size) if crop_size else None
         self.crop_aspect = crop_aspect
         self.output_format = output_format
+        self.black_and_white = black_and_white
         self.default_mode = default_mode
 
     @staticmethod
@@ -277,6 +280,10 @@ class ImageProcessor:
             img = self.resize_by_height(img, self.height)
         elif self.size:
             img = self.resize_to_size(img, self.size)
+
+        # Apply color effects
+        if self.black_and_white:
+            img = img.convert("L")
 
         return img
 
