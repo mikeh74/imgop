@@ -1,11 +1,12 @@
 .PHONY: help install install-dev lint format check test clean build dist upload pre-commit
 
 # Variables
-PYTHON := .venv/bin/python
-PIP := .venv/bin/pip
-RUFF := .venv/bin/ruff
-PYTEST := .venv/bin/pytest
-PRE_COMMIT := .venv/bin/pre-commit
+VENV_NAME ?= .venv
+PYTHON_ENV_PATH := $(or $(VIRTUAL_ENV), $(VENV_NAME))
+PIP = $(PYTHON_ENV_PATH)/bin/pip
+RUFF = $(PYTHON_ENV_PATH)/bin/ruff
+PYTEST = $(PYTHON_ENV_PATH)/bin/pytest
+PRECOMMIT = $(PYTHON_ENV_PATH)/bin/pre-commit
 
 # Default target
 help:
@@ -22,44 +23,40 @@ help:
 	@echo "  dist         - Create distribution files"
 	@echo "  upload       - Upload to PyPI (requires authentication)"
 
+pip_env:
+	@# check if PYTHON_ENV = $(VENV_NAME) and if it is then check whether the directory exists
+	@-echo "PYTHON_ENV is set to $(PYTHON_ENV_PATH)";
+	@-if [ "$(PYTHON_ENV_PATH)" = $(VENV_NAME) ]; then \
+		if [ ! -d "$(PYTHON_ENV_PATH)" ]; then \
+			python3 -m venv $(VENV_NAME) && $(VENV_NAME)/bin/pip install --upgrade pip; \
+			echo "Virtual environment created."; \
+		fi; \
+	fi
+
 # Create virtual environment if it doesn't exist
-.venv/bin/activate:
-	python3 -m venv .venv
-	$(PIP) install --upgrade pip setuptools wheel
+.venv/bin/activate: pip_env
 
 # Installation targets
-install: .venv/bin/activate
-	$(PIP) install .
+# install: pip_env
+# 	$(PIP) install .
 
-install-dev: .venv/bin/activate
-	$(PIP) install -e ".[dev]"
-
-# Code quality targets
-.venv/bin/ruff: .venv/bin/activate
-	$(PIP) install ruff
-
-lint: .venv/bin/ruff
-	$(RUFF) check src/ tests/
-
-format: .venv/bin/ruff
-	$(RUFF) format src/ tests/
-
-format-check: .venv/bin/ruff
-	$(RUFF) format --check src/ tests/
-
-check: lint format-check
-	@echo "✅ All checks passed!"
+# install-dev: pip_env
+# 	$(PIP) install -e ".[dev]"
 
 # Pre-commit targets
 pre-commit: pre-commit-install
-	$(PRE_COMMIT) run --all-files
+	$(PRECOMMIT) run
+
+# Pre-commit targets
+pre-commit-all: pre-commit-install
+	$(PRECOMMIT) run --all-files
 
 pre-commit-install:
 	$(PIP) install pre-commit
-	$(PRE_COMMIT) install
+	$(PRECOMMIT) install
 
 pre-commit-update:
-	$(PRE_COMMIT) autoupdate
+	$(PRECOMMIT) autoupdate
 
 # Testing targets
 test:
@@ -85,14 +82,14 @@ dist: build
 	@echo "Distribution files created in dist/"
 	@ls -la dist/
 
-upload: dist
-	$(PYTHON) -m twine upload dist/*
+# upload: dist
+# 	$(PYTHON) -m twine upload dist/*
 
 # Development shortcuts
 fix: format
 	$(RUFF) check --fix src/ tests/
 
-dev-setup: install-dev
-	$(PRE_COMMIT) install
-	@echo "Development environment set up!"
-	@echo "Run 'make check' or 'make pre-commit' to verify everything works."
+# dev-setup: install-dev
+# 	$(PRE_COMMIT) install
+# 	@echo "Development environment set up!"
+# 	@echo "Run 'make check' or 'make pre-commit' to verify everything works."
