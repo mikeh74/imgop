@@ -111,7 +111,7 @@ Examples:
     help="Crop to specific aspect ratio (e.g., 16:9, 4:3, 1:1)",
 )
 @click.option(
-    "-o",
+    "-f",
     "--format",
     "output_format",
     type=click.Choice(["jpeg", "jpg", "png", "webp"], case_sensitive=False),
