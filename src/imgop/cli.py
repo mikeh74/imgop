@@ -111,6 +111,7 @@ Examples:
     help="Crop to specific aspect ratio (e.g., 16:9, 4:3, 1:1)",
 )
 @click.option(
+    "-o",
     "--format",
     "output_format",
     type=click.Choice(["jpeg", "jpg", "png", "webp"], case_sensitive=False),
@@ -144,11 +145,17 @@ def main(
     try:
         # Validate scale
         if scale is not None and scale <= 0:
-            raise click.BadParameter("Scale must be greater than 0", param_hint="scale")
+            raise click.BadParameter(
+                "Scale must be greater than 0",
+                param_hint="scale",
+            )
 
         # Validate width
         if width is not None and width <= 0:
-            raise click.BadParameter("Width must be greater than 0", param_hint="width")
+            raise click.BadParameter(
+                "Width must be greater than 0",
+                param_hint="width",
+            )
 
         # Validate height
         if height is not None and height <= 0:
