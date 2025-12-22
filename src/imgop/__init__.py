@@ -1,6 +1,6 @@
 """Image Fixer - A utility for resizing images and creating thumbnails."""
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __author__ = "Mike Horrocks"
 __email__ = "mikeh_74_@outlook.com"
 

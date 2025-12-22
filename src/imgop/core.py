@@ -63,6 +63,59 @@ class ImageProcessor:
         """
         return (size[0] // factor, size[1] // factor)
 
+    @staticmethod
+    def correct_image_orientation(img: Image.Image) -> Image.Image:
+        """Correct image orientation based on EXIF data.
+
+        Args:
+            img: PIL Image object
+
+        Returns:
+            Image with corrected orientation
+        """
+        try:
+            # Get EXIF data
+            exif = img.getexif()
+            if exif is None:
+                return img
+
+            # EXIF orientation tag is 274 (0x0112)
+            orientation = exif.get(274)
+
+            if orientation is None:
+                return img
+
+            # Apply the appropriate transformation
+            if orientation == 2:
+                # Mirrored horizontally
+                img = img.transpose(Image.FLIP_LEFT_RIGHT)
+            elif orientation == 3:
+                # Rotated 180 degrees
+                img = img.rotate(180, expand=True)
+            elif orientation == 4:
+                # Mirrored vertically
+                img = img.transpose(Image.FLIP_TOP_BOTTOM)
+            elif orientation == 5:
+                # Mirrored horizontally and rotated 90 degrees CCW
+                img = img.transpose(Image.FLIP_LEFT_RIGHT)
+                img = img.rotate(90, expand=True)
+            elif orientation == 6:
+                # Rotated 90 degrees CCW
+                img = img.rotate(270, expand=True)
+            elif orientation == 7:
+                # Mirrored horizontally and rotated 90 degrees CW
+                img = img.transpose(Image.FLIP_LEFT_RIGHT)
+                img = img.rotate(270, expand=True)
+            elif orientation == 8:
+                # Rotated 90 degrees CW
+                img = img.rotate(90, expand=True)
+
+        except (AttributeError, KeyError, TypeError):
+            # If there's any issue reading EXIF, just return the original image
+            pass
+
+        return img
+
     def save_image(
         self,
         img: Image.Image,
@@ -335,6 +388,9 @@ class ImageProcessor:
         # Read the image
         img = Image.open(imgfile)
 
+        # Correct orientation based on EXIF data (fixes HEIC rotation issues)
+        img = self.correct_image_orientation(img)
+
         # Extract filename without extension
         pieces = os.path.split(imgfile)
         filename = os.path.splitext(pieces[1])[0]
@@ -362,7 +418,7 @@ class ImageProcessor:
             directory: path to input directory
             outfile: path to output directory
         """
-        supported_extensions = [".jpg", ".jpeg", ".png", ".webp"]
+        supported_extensions = [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"]
 
         for filename in os.listdir(directory):
             file_path = os.path.join(directory, filename)
