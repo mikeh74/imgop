@@ -65,7 +65,7 @@ Examples:
 )
 @click.option(
     "-t",
-    "--thumbnail-quality",
+    "--thumbnail",
     type=click.IntRange(1, 100),
     default=70,
     show_default=True,
@@ -126,6 +126,14 @@ Examples:
     default=False,
     help="Convert image to black and white (grayscale)",
 )
+@click.option(
+    "--thumb",
+    "--thumbnail",
+    "thumbnail",
+    is_flag=True,
+    default=False,
+    help="Create square thumbnail (saved with _sm suffix)",
+)
 @click.version_option(version="0.1.0", prog_name="imgop")
 def main(
     path,
@@ -140,6 +148,7 @@ def main(
     crop_aspect,
     output_format,
     black_and_white,
+    thumbnail,
 ):
     """Main entry point for the CLI."""
     try:
@@ -184,6 +193,19 @@ def main(
                 "Cannot use multiple crop options (crop-size, crop-aspect) together"
             )
 
+        # Check if thumbnail conflicts with transformation options
+        if thumbnail and (
+            scale is not None
+            or width is not None
+            or height is not None
+            or size is not None
+            or crop_size is not None
+            or crop_aspect is not None
+        ):
+            raise click.UsageError(
+                "Cannot use --thumb with other resize or crop options"
+            )
+
         # Determine if using default mode (no special options)
         use_default_mode = all(
             [
@@ -195,6 +217,7 @@ def main(
                 crop_aspect is None,
                 output_format is None,
                 not black_and_white,
+                not thumbnail,
             ]
         )
 
@@ -210,6 +233,7 @@ def main(
             output_format=output_format,
             black_and_white=black_and_white,
             default_mode=use_default_mode,
+            thumbnail_mode=thumbnail,
         )
 
         processor.process_path(path, output)

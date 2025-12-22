@@ -22,6 +22,7 @@ class ImageProcessor:
         output_format: str | None = None,
         black_and_white: bool = False,
         default_mode: bool = True,
+        thumbnail_mode: bool = False,
     ):
         """Initialize ImageProcessor with quality and transformation settings.
 
@@ -37,6 +38,7 @@ class ImageProcessor:
             output_format: Output format (jpeg, png, webp)
             black_and_white: Convert image to grayscale
             default_mode: Whether to use default thumbnail/resize behavior
+            thumbnail_mode: Whether to create square thumbnail with _sm suffix
         """
         self.quality = quality
         self.thumbnail_quality = thumbnail_quality
@@ -49,6 +51,7 @@ class ImageProcessor:
         self.output_format = output_format
         self.black_and_white = black_and_white
         self.default_mode = default_mode
+        self.thumbnail_mode = thumbnail_mode
 
     @staticmethod
     def scale_size(size: tuple[int, int], factor: int) -> tuple[int, int]:
@@ -396,11 +399,13 @@ class ImageProcessor:
         filename = os.path.splitext(pieces[1])[0]
 
         if self.default_mode:
-            # Default mode: create resized and thumbnail versions
+            # Default mode: create resized version only
             self.save_image(self.make_resized(img), f"{filename}_md", outfile)
+        elif self.thumbnail_mode:
+            # Thumbnail mode: create square thumbnail
             self.save_image(
                 self.make_thumbnail(img),
-                f"{filename}_sq_thumb",
+                f"{filename}_sm",
                 outfile,
                 self.thumbnail_quality,
             )
