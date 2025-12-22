@@ -86,13 +86,14 @@ class ImageProcessor:
         if output_format is None:
             output_format = self.output_format
 
-        # Determine file extension
+        # Determine file extension - always add proper extension
         if output_format:
             ext = "jpg" if output_format == "jpeg" else output_format
-            full_filename = f"{filename}.{ext}"
         else:
-            full_filename = filename if "." in filename else f"{filename}.jpg"
+            # Default to jpg if no format specified
+            ext = "jpg"
 
+        full_filename = f"{filename}.{ext}"
         path = os.path.join(outfile, full_filename)
 
         # Convert RGBA to RGB for JPEG
@@ -256,6 +257,43 @@ class ImageProcessor:
             top = (img_height - new_height) // 2
             return img.crop((0, top, img_width, top + new_height))
 
+    def generate_suffix(self) -> str:
+        """Generate a descriptive suffix based on applied operations.
+
+        Returns:
+            Suffix string describing the operations (e.g., "_scale_50" or "_w800")
+        """
+        parts = []
+
+        # Add crop suffix
+        if self.crop_size:
+            parts.append(f"crop_{self.crop_size[0]}x{self.crop_size[1]}")
+        elif self.crop_aspect:
+            aspect_clean = self.crop_aspect.replace(":", "_")
+            parts.append(f"aspect_{aspect_clean}")
+
+        # Add resize suffix
+        if self.scale:
+            # Format scale without decimal if it's a whole number
+            scale_str = (
+                f"{self.scale:.0f}"
+                if self.scale == int(self.scale)
+                else f"{self.scale:.1f}".rstrip("0").rstrip(".")
+            )
+            parts.append(f"scale_{scale_str}")
+        elif self.width:
+            parts.append(f"w{self.width}")
+        elif self.height:
+            parts.append(f"h{self.height}")
+        elif self.size:
+            parts.append(f"{self.size[0]}x{self.size[1]}")
+
+        # Add color effect suffix
+        if self.black_and_white:
+            parts.append("bw")
+
+        return "_" + "_".join(parts) if parts else ""
+
     def apply_transformations(self, img: Image.Image) -> Image.Image:
         """Apply all configured transformations to an image.
 
@@ -313,7 +351,9 @@ class ImageProcessor:
         else:
             # Custom mode: apply specified transformations
             transformed_img = self.apply_transformations(img)
-            self.save_image(transformed_img, filename, outfile)
+            suffix = self.generate_suffix()
+            output_filename = f"{filename}{suffix}"
+            self.save_image(transformed_img, output_filename, outfile)
 
     def process_directory(self, directory: str, outfile: str) -> None:
         """Process all supported image files in a directory.

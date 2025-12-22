@@ -26,10 +26,10 @@ make install-dev
 pip install .
 ```
 
-### Using pip (when published)
+### Install using pipx from github
 
 ```bash
-pip install imgop
+pipx install git+https://github.com/mikeh74/imgop.git
 ```
 
 ## Usage
