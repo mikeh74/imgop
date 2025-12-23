@@ -65,7 +65,7 @@ Examples:
 )
 @click.option(
     "-t",
-    "--thumbnail",
+    "--thumbnail-quality",
     type=click.IntRange(1, 100),
     default=70,
     show_default=True,
