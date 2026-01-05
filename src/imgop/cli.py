@@ -50,7 +50,7 @@ def validate_aspect_ratio(ctx, param, value):
     help="Output quality for JPEG/WebP",
 )
 @click.option(
-    "-t",
+    "--tq",
     "--thumbnail-quality",
     type=click.IntRange(1, 100),
     default=70,
@@ -117,6 +117,7 @@ def validate_aspect_ratio(ctx, param, value):
     help="Convert image to black and white (grayscale)",
 )
 @click.option(
+    "-t",
     "--thumb",
     "--thumbnail",
     "thumbnail",
@@ -124,7 +125,7 @@ def validate_aspect_ratio(ctx, param, value):
     default=False,
     help="Create square thumbnail (saved with _sm suffix)",
 )
-@click.version_option(version="0.1.0", prog_name="imgop")
+@click.version_option(version="0.6.5", prog_name="imgop")
 def main(
     path,
     output,
