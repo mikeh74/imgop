@@ -89,7 +89,6 @@ def validate_crop_option(ctx, param, value):
     help="Output quality for JPEG/WebP",
 )
 @click.option(
-    "--tq",
     "--thumbnail-quality",
     type=click.IntRange(1, 100),
     default=70,
