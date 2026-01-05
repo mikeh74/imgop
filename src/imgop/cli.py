@@ -29,6 +29,45 @@ def validate_aspect_ratio(ctx, param, value):
     return value
 
 
+def validate_crop_option(ctx, param, value):
+    """Validate crop option - accepts either WIDTH HEIGHT or ASPECT_RATIO."""
+    if value is None:
+        return None, None
+
+    # If it's a tuple of two values, could be (int, int) or (str, str) or (str, None)
+    if isinstance(value, tuple):
+        # Check if we have two integer values (e.g., -c 500 400)
+        if len(value) == 2 and value[0] is not None and value[1] is not None:
+            try:
+                width = int(value[0])
+                height = int(value[1])
+                if width <= 0 or height <= 0:
+                    raise click.BadParameter("Crop dimensions must be greater than 0")
+                return (width, height), None
+            except (ValueError, TypeError):
+                pass
+
+        # Check if first value is an aspect ratio string
+        if len(value) >= 1 and value[0] is not None:
+            aspect_str = str(value[0])
+            if ":" in aspect_str:
+                try:
+                    parts = aspect_str.split(":")
+                    if len(parts) != 2:
+                        raise ValueError
+                    float(parts[0])
+                    float(parts[1])
+                    return None, aspect_str
+                except ValueError:
+                    raise click.BadParameter(
+                        "Aspect ratio must be in format width:height with numeric values (e.g., 5:4, 16:9)"
+                    ) from None
+
+    raise click.BadParameter(
+        "Must provide either WIDTH HEIGHT (e.g., -c 500 400) or ASPECT_RATIO (e.g., -c 5:4)"
+    )
+
+
 @click.command(
     name="imgop",
     help="Resize and crop images with flexible options",
@@ -87,22 +126,11 @@ def validate_aspect_ratio(ctx, param, value):
 @click.option(
     "-c",
     "--crop",
-    "--crop-size",
-    type=(int, int),
+    nargs=2,
     default=None,
-    metavar="WIDTH HEIGHT",
-    help="Crop to specific width and height from center",
-)
-@click.option(
-    "--aspect",
-    "--crop-aspect",
-    type=click.Choice(
-        ["16:9", "5:3", "4:3", "3:4", "3:2", "1:1"],
-        case_sensitive=False,
-    ),
-    default=None,
-    callback=validate_aspect_ratio,
-    help="Crop to specific aspect ratio",
+    metavar="WIDTH HEIGHT | ASPECT_RATIO",
+    callback=validate_crop_option,
+    help="Crop to dimensions (e.g., -c 500 400) or aspect ratio (e.g., -c 5:4)",
 )
 @click.option(
     "-f",
@@ -129,7 +157,7 @@ def validate_aspect_ratio(ctx, param, value):
     default=False,
     help="Create square thumbnail (saved with _sm suffix)",
 )
-@click.version_option(version="0.6.5", prog_name="imgop")
+@click.version_option(version="0.6.6", prog_name="imgop")
 def main(
     path,
     output,
@@ -139,8 +167,7 @@ def main(
     width,
     height,
     size,
-    crop_size,
-    crop_aspect,
+    crop,
     output_format,
     black_and_white,
     thumbnail,
@@ -181,13 +208,8 @@ def main(
                 "Cannot use multiple resize options (scale, width, height, size) together"
             )
 
-        # Check for conflicting crop options
-        crop_options = sum([crop_size is not None, crop_aspect is not None])
-        if crop_options > 1:
-            raise click.UsageError(
-                "Cannot use multiple crop options (crop-size, crop-aspect) together"
-            )
-
+        # Unpack crop option (returns tuple of crop_size and crop_aspect)
+        crop_size, crop_aspect = crop if crop else (None, None)
         # Check if thumbnail conflicts with transformation options
         if thumbnail and (
             scale is not None
