@@ -94,11 +94,15 @@ def validate_aspect_ratio(ctx, param, value):
     help="Crop to specific width and height from center",
 )
 @click.option(
+    "--aspect",
     "--crop-aspect",
-    type=str,
+    type=click.Choice(
+        ["16:9", "5:3", "4:3", "3:4", "3:2", "1:1"],
+        case_sensitive=False,
+    ),
     default=None,
     callback=validate_aspect_ratio,
-    help="Crop to specific aspect ratio (e.g., 16:9, 4:3, 1:1)",
+    help="Crop to specific aspect ratio",
 )
 @click.option(
     "-f",
