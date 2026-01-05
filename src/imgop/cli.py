@@ -32,21 +32,6 @@ def validate_aspect_ratio(ctx, param, value):
 @click.command(
     name="imgop",
     help="Resize and crop images with flexible options",
-    epilog="""
-Examples:
-    - Process single image: `imgop image.jpg`
-    - Process directory of images: `imgop /path/to/images/`
-    - Specify output directory: `imgop image.jpg -o /output/`
-    - Scale to 50% of original size: `imgop image.jpg --scale 50`
-    - Resize to width 800px (height auto): `imgop image.jpg --width 800`
-    - Resize to specific width and height: `imgop image.jpg --size 1920 1080`
-    - Crop to 800x600 from center: `imgop image.jpg --crop-size 800 600`
-    - Crop to 16:9 aspect ratio: `imgop image.jpg --crop-aspect 16:9`
-    - Create square thumbnail: `imgop image.jpg --thumb`
-    - Convert to different format: `imgop image.jpg --format webp`
-    - Convert to black and white: `imgop image.jpg --bw`
-    - Combine options: `imgop image.jpg --scale 150 --format png`
-""",
 )
 @click.argument("path", type=click.Path(exists=True))
 @click.option(
@@ -79,12 +64,14 @@ Examples:
     help="Scale image by percentage (e.g., 50 for 50%, 150 for 150%)",
 )
 @click.option(
+    "-w",
     "--width",
     type=int,
     default=None,
     help="Resize to specific width (height calculated automatically)",
 )
 @click.option(
+    "-h",
     "--height",
     type=int,
     default=None,
@@ -98,6 +85,8 @@ Examples:
     help="Resize to specific width and height",
 )
 @click.option(
+    "-c",
+    "--crop",
     "--crop-size",
     type=(int, int),
     default=None,
