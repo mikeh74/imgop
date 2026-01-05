@@ -16,8 +16,8 @@ A Python utility for resizing images and creating thumbnails.
 
 ```bash
 # Clone the repository
-git clone https://github.com/mikeh74/image_sizer.git
-cd image_sizer
+git clone https://github.com/mikeh74/imgop.git
+cd imgop
 
 # Install in development mode
 make install-dev

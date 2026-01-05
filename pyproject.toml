@@ -39,9 +39,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/mikeh74/image_sizer"
-Repository = "https://github.com/mikeh74/image_sizer"
-Issues = "https://github.com/mikeh74/image_sizer/issues"
+Homepage = "https://github.com/mikeh74/imgop"
+Repository = "https://github.com/mikeh74/imgop"
+Issues = "https://github.com/mikeh74/imgop/issues"
 
 [project.scripts]
 imgop = "imgop.cli:main"

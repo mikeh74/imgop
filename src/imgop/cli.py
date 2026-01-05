@@ -34,17 +34,41 @@ def validate_aspect_ratio(ctx, param, value):
     help="Resize and crop images with flexible options",
     epilog="""
 Examples:
-  imgop image.jpg                              # Process single image (default mode)
-  imgop /path/to/images/                       # Process directory
-  imgop image.jpg -o /output/                  # Specify output directory
-  imgop image.jpg --scale 50                   # Scale to 50% of original size
-  imgop image.jpg --width 800                  # Resize to width 800px (auto height)
-  imgop image.jpg --size 1920 1080             # Resize to specific width and height
-  imgop image.jpg --crop-size 800 600          # Crop to 800x600 from center
-  imgop image.jpg --crop-aspect 16:9           # Crop to 16:9 aspect ratio
-  imgop image.jpg --format webp                # Convert to WebP format
-  imgop image.jpg --bw                         # Convert to black and white
-  imgop image.jpg --scale 150 --format png     # Scale to 150% and save as PNG
+  - Process single image (default mode):
+        `imgop image.jpg`
+
+    - Process directory of images:
+        `imgop /path/to/images/`
+
+    - Specify output directory:
+        `imgop image.jpg -o /output/`
+
+    - Scale image to 50% of original size:
+        `imgop image.jpg --scale 50`
+
+    - Resize image to width 800px (height auto):
+        `imgop image.jpg --width 800`
+
+    - Resize image to specific width and height:
+        `imgop image.jpg --size 1920 1080`
+
+    - Crop image to 800x600 from center:
+        `imgop image.jpg --crop-size 800 600`
+
+    - Crop image to 16:9 aspect ratio:
+        `imgop image.jpg --crop-aspect 16:9`
+
+    - Create square thumbnail:
+        `imgop image.jpg --thumb`
+
+    - Convert image to different format:
+        `imgop image.jpg --format webp`
+
+    - Convert image to black and white:
+        `imgop image.jpg --bw`
+
+    - Combine options:
+        `imgop image.jpg --scale 150 --format png`
 """,
 )
 @click.argument("path", type=click.Path(exists=True))
