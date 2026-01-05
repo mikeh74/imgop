@@ -31,41 +31,47 @@ def validate_aspect_ratio(ctx, param, value):
 
 def validate_crop_option(ctx, param, value):
     """Validate crop option - accepts either WIDTH HEIGHT or ASPECT_RATIO."""
-    if value is None:
+    if not value:
         return None, None
 
-    # If it's a tuple of two values, could be (int, int) or (str, str) or (str, None)
-    if isinstance(value, tuple):
-        # Check if we have two integer values (e.g., -c 500 400)
-        if len(value) == 2 and value[0] is not None and value[1] is not None:
+    # value is a tuple from nargs=-1, can be 1 or 2 elements
+    if len(value) == 1:
+        # Single argument - must be aspect ratio
+        aspect_str = str(value[0])
+        if ":" in aspect_str:
             try:
-                width = int(value[0])
-                height = int(value[1])
-                if width <= 0 or height <= 0:
-                    raise click.BadParameter("Crop dimensions must be greater than 0")
-                return (width, height), None
-            except (ValueError, TypeError):
-                pass
+                parts = aspect_str.split(":")
+                if len(parts) != 2:
+                    raise ValueError
+                float(parts[0])
+                float(parts[1])
+                return None, aspect_str
+            except ValueError:
+                raise click.BadParameter(
+                    "Aspect ratio must be in format width:height with numeric values (e.g., 5:4, 16:9)"
+                ) from None
+        else:
+            raise click.BadParameter(
+                "Single argument must be an aspect ratio (e.g., -c 5:4 or -c 16:9)"
+            )
 
-        # Check if first value is an aspect ratio string
-        if len(value) >= 1 and value[0] is not None:
-            aspect_str = str(value[0])
-            if ":" in aspect_str:
-                try:
-                    parts = aspect_str.split(":")
-                    if len(parts) != 2:
-                        raise ValueError
-                    float(parts[0])
-                    float(parts[1])
-                    return None, aspect_str
-                except ValueError:
-                    raise click.BadParameter(
-                        "Aspect ratio must be in format width:height with numeric values (e.g., 5:4, 16:9)"
-                    ) from None
+    elif len(value) == 2:
+        # Two arguments - must be width and height
+        try:
+            width = int(value[0])
+            height = int(value[1])
+            if width <= 0 or height <= 0:
+                raise click.BadParameter("Crop dimensions must be greater than 0")
+            return (width, height), None
+        except (ValueError, TypeError):
+            raise click.BadParameter(
+                "Two arguments must be integers for width and height (e.g., -c 500 400)"
+            ) from None
 
-    raise click.BadParameter(
-        "Must provide either WIDTH HEIGHT (e.g., -c 500 400) or ASPECT_RATIO (e.g., -c 5:4)"
-    )
+    else:
+        raise click.BadParameter(
+            "Must provide either WIDTH HEIGHT (e.g., -c 500 400) or ASPECT_RATIO (e.g., -c 16:9)"
+        )
 
 
 @click.command(
@@ -125,11 +131,11 @@ def validate_crop_option(ctx, param, value):
 @click.option(
     "-c",
     "--crop",
-    nargs=2,
+    nargs=-1,
     default=None,
-    metavar="WIDTH HEIGHT | ASPECT_RATIO",
+    metavar="[WIDTH HEIGHT | ASPECT_RATIO]",
     callback=validate_crop_option,
-    help="Crop to dimensions (e.g., -c 500 400) or aspect ratio (e.g., -c 5:4)",
+    help="Crop to dimensions (e.g., -c 500 400) or aspect ratio (e.g., -c 16:9)",
 )
 @click.option(
     "-f",
