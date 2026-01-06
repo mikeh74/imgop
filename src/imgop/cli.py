@@ -4,7 +4,7 @@ import sys
 
 import click
 
-from .core import ImageProcessor
+from imgop.core import ImageProcessor
 
 
 def validate_crop_option(ctx, param, value):
@@ -44,13 +44,6 @@ def validate_crop_option(ctx, param, value):
     default=85,
     show_default=True,
     help="Output quality for JPEG/WebP",
-)
-@click.option(
-    "--thumbnail-quality",
-    type=click.IntRange(1, 100),
-    default=70,
-    show_default=True,
-    help="JPEG quality for thumbnails",
 )
 @click.option(
     "--scale",
@@ -116,12 +109,18 @@ def validate_crop_option(ctx, param, value):
     default=False,
     help="Create square thumbnail (saved with _sm suffix)",
 )
-@click.version_option(version="0.6.6", prog_name="imgop")
+@click.option(
+    "--thumbnail-quality",
+    type=click.IntRange(1, 100),
+    default=70,
+    show_default=True,
+    help="JPEG quality for thumbnails",
+)
+@click.version_option(version="0.7.0", prog_name="imgop")
 def main(
     path,
     output,
     quality,
-    thumbnail_quality,
     scale,
     width,
     height,
@@ -130,6 +129,7 @@ def main(
     output_format,
     black_and_white,
     thumbnail,
+    thumbnail_quality,
 ):
     """Main entry point for the CLI."""
     try:
@@ -196,7 +196,6 @@ def main(
 
         processor = ImageProcessor(
             quality=quality,
-            thumbnail_quality=thumbnail_quality,
             scale=scale,
             width=width,
             height=height,
@@ -206,6 +205,7 @@ def main(
             black_and_white=black_and_white,
             default_mode=use_default_mode,
             thumbnail_mode=thumbnail,
+            thumbnail_quality=thumbnail_quality,
         )
 
         processor.process_path(path, output)
