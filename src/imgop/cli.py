@@ -109,13 +109,6 @@ def validate_crop_option(ctx, param, value):
     default=False,
     help="Create square thumbnail (saved with _sm suffix)",
 )
-@click.option(
-    "--thumbnail-quality",
-    type=click.IntRange(1, 100),
-    default=70,
-    show_default=True,
-    help="JPEG quality for thumbnails",
-)
 @click.version_option(version="0.7.0", prog_name="imgop")
 def main(
     path,
@@ -129,7 +122,6 @@ def main(
     output_format,
     black_and_white,
     thumbnail,
-    thumbnail_quality,
 ):
     """Main entry point for the CLI."""
     try:
@@ -194,19 +186,34 @@ def main(
             ]
         )
 
-        processor = ImageProcessor(
-            quality=quality,
-            scale=scale,
-            width=width,
-            height=height,
-            crop_aspect=aspect_ratio,
-            crop_percent=crop_percent,
-            output_format=output_format,
-            black_and_white=black_and_white,
-            default_mode=use_default_mode,
-            thumbnail_mode=thumbnail,
-            thumbnail_quality=thumbnail_quality,
-        )
+        # Configure processor based on mode
+        if use_default_mode:
+            # Default mode: scale by 50% with _md suffix
+            processor = ImageProcessor(
+                quality=quality,
+                scale=50,
+                suffix="_md",
+            )
+        elif thumbnail:
+            # Thumbnail mode: scale by 25% and crop to 1:1 aspect with _sm suffix
+            processor = ImageProcessor(
+                quality=quality,
+                scale=25,
+                crop_aspect="1:1",
+                suffix="_sm",
+            )
+        else:
+            # Custom mode: use specified parameters
+            processor = ImageProcessor(
+                quality=quality,
+                scale=scale,
+                width=width,
+                height=height,
+                crop_aspect=aspect_ratio,
+                crop_percent=crop_percent,
+                output_format=output_format,
+                black_and_white=black_and_white,
+            )
 
         processor.process_path(path, output)
 

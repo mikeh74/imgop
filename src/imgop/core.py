@@ -12,7 +12,6 @@ class ImageProcessor:
     def __init__(
         self,
         quality: int = 85,
-        thumbnail_quality: int = 70,
         scale: float | None = None,
         width: int | None = None,
         height: int | None = None,
@@ -22,14 +21,12 @@ class ImageProcessor:
         crop_percent: float | None = None,
         output_format: str | None = None,
         black_and_white: bool = False,
-        default_mode: bool = True,
-        thumbnail_mode: bool = False,
+        suffix: str | None = None,
     ):
         """Initialize ImageProcessor with quality and transformation settings.
 
         Args:
             quality: JPEG/WebP quality for resized images (1-100)
-            thumbnail_quality: JPEG quality for thumbnails (1-100)
             scale: Scale percentage (e.g., 50 for 50%, 150 for 150%)
             width: Target width for resize (height auto-calculated)
             height: Target height for resize (width auto-calculated)
@@ -39,11 +36,9 @@ class ImageProcessor:
             crop_percent: Crop to percentage of original size (e.g., 50 for 50%)
             output_format: Output format (jpeg, png, webp)
             black_and_white: Convert image to grayscale
-            default_mode: Whether to use default thumbnail/resize behavior
-            thumbnail_mode: Whether to create square thumbnail with _sm suffix
+            suffix: Custom suffix for output filename (e.g., "_md", "_sm")
         """
         self.quality = quality
-        self.thumbnail_quality = thumbnail_quality
         self.scale = scale
         self.width = width
         self.height = height
@@ -53,8 +48,7 @@ class ImageProcessor:
         self.crop_percent = crop_percent
         self.output_format = output_format
         self.black_and_white = black_and_white
-        self.default_mode = default_mode
-        self.thumbnail_mode = thumbnail_mode
+        self.suffix = suffix
 
     @staticmethod
     def scale_size(size: tuple[int, int], factor: int) -> tuple[int, int]:
@@ -440,23 +434,17 @@ class ImageProcessor:
         pieces = os.path.split(imgfile)
         filename = os.path.splitext(pieces[1])[0]
 
-        if self.default_mode:
-            # Default mode: create resized version only
-            self.save_image(self.make_resized(img), f"{filename}_md", outfile)
-        elif self.thumbnail_mode:
-            # Thumbnail mode: create square thumbnail
-            self.save_image(
-                self.make_thumbnail(img),
-                f"{filename}_sm",
-                outfile,
-                self.thumbnail_quality,
-            )
+        # Apply specified transformations
+        transformed_img = self.apply_transformations(img)
+        
+        # Generate suffix based on transformations or use custom suffix
+        if self.suffix:
+            suffix = self.suffix
         else:
-            # Custom mode: apply specified transformations
-            transformed_img = self.apply_transformations(img)
             suffix = self.generate_suffix()
-            output_filename = f"{filename}{suffix}"
-            self.save_image(transformed_img, output_filename, outfile)
+        
+        output_filename = f"{filename}{suffix}"
+        self.save_image(transformed_img, output_filename, outfile)
 
     def process_directory(self, directory: str, outfile: str) -> None:
         """Process all supported image files in a directory.
