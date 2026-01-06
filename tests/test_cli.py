@@ -6,8 +6,6 @@ import tempfile
 from click.testing import CliRunner
 from PIL import Image
 
-import pytest
-
 from imgop.cli import main
 
 

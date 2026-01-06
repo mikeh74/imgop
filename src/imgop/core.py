@@ -436,13 +436,13 @@ class ImageProcessor:
 
         # Apply specified transformations
         transformed_img = self.apply_transformations(img)
-        
+
         # Generate suffix based on transformations or use custom suffix
         if self.suffix:
             suffix = self.suffix
         else:
             suffix = self.generate_suffix()
-        
+
         output_filename = f"{filename}{suffix}"
         self.save_image(transformed_img, output_filename, outfile)
 
