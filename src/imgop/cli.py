@@ -12,8 +12,6 @@ def validate_crop_option(ctx, param, value):
     if not value:
         return None
 
-    value = value.strip()
-
     try:
         percent = float(value)
         if percent <= 0 or percent >= 100:
@@ -77,7 +75,7 @@ def validate_crop_option(ctx, param, value):
 @click.option(
     "-c",
     "--crop",
-    type=str,
+    type=int,
     default=None,
     metavar="PERCENT",
     callback=validate_crop_option,
