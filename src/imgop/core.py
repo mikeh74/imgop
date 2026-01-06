@@ -19,6 +19,7 @@ class ImageProcessor:
         size: tuple[int, int] | None = None,
         crop_size: tuple[int, int] | None = None,
         crop_aspect: str | None = None,
+        crop_percent: float | None = None,
         output_format: str | None = None,
         black_and_white: bool = False,
         default_mode: bool = True,
@@ -35,6 +36,7 @@ class ImageProcessor:
             size: Target (width, height) for resize
             crop_size: Crop to (width, height) from center
             crop_aspect: Crop to aspect ratio (e.g., "16:9")
+            crop_percent: Crop to percentage of original size (e.g., 50 for 50%)
             output_format: Output format (jpeg, png, webp)
             black_and_white: Convert image to grayscale
             default_mode: Whether to use default thumbnail/resize behavior
@@ -48,6 +50,7 @@ class ImageProcessor:
         self.size = tuple(size) if size else None
         self.crop_size = tuple(crop_size) if crop_size else None
         self.crop_aspect = crop_aspect
+        self.crop_percent = crop_percent
         self.output_format = output_format
         self.black_and_white = black_and_white
         self.default_mode = default_mode
@@ -313,6 +316,31 @@ class ImageProcessor:
             top = (img_height - new_height) // 2
             return img.crop((0, top, img_width, top + new_height))
 
+    def crop_by_percent(self, img: Image.Image, percent: float) -> Image.Image:
+        """Crop image to percentage of original size from center.
+
+        Args:
+            img: PIL Image object
+            percent: Percentage to crop to (e.g., 50 for 50%)
+
+        Returns:
+            Cropped PIL Image object
+        """
+        img_width, img_height = img.size
+        factor = percent / 100.0
+
+        # Calculate new dimensions
+        new_width = int(img_width * factor)
+        new_height = int(img_height * factor)
+
+        # Calculate crop box centered in image
+        left = (img_width - new_width) // 2
+        top = (img_height - new_height) // 2
+        right = left + new_width
+        bottom = top + new_height
+
+        return img.crop((left, top, right, bottom))
+
     def generate_suffix(self) -> str:
         """Generate a descriptive suffix based on applied operations.
 
@@ -327,6 +355,14 @@ class ImageProcessor:
         elif self.crop_aspect:
             aspect_clean = self.crop_aspect.replace(":", "_")
             parts.append(f"aspect_{aspect_clean}")
+        elif self.crop_percent:
+            # Format percent without decimal if it's a whole number
+            percent_str = (
+                f"{self.crop_percent:.0f}"
+                if self.crop_percent == int(self.crop_percent)
+                else f"{self.crop_percent:.1f}".rstrip("0").rstrip(".")
+            )
+            parts.append(f"crop_{percent_str}pct")
 
         # Add resize suffix
         if self.scale:
@@ -359,11 +395,17 @@ class ImageProcessor:
         Returns:
             Transformed PIL Image object
         """
-        # Apply crop operations first
+        # Apply aspect ratio crop first if specified
+        if self.crop_aspect:
+            img = self.crop_to_aspect(img, self.crop_aspect)
+
+        # Then apply percentage crop (after aspect ratio)
+        if self.crop_percent:
+            img = self.crop_by_percent(img, self.crop_percent)
+
+        # Apply other crop operations
         if self.crop_size:
             img = self.crop_to_size(img, self.crop_size)
-        elif self.crop_aspect:
-            img = self.crop_to_aspect(img, self.crop_aspect)
 
         # Apply resize operations
         if self.scale:

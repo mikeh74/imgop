@@ -77,7 +77,7 @@ def validate_crop_option(ctx, param, value):
 @click.option(
     "-c",
     "--crop",
-    type=int,
+    type=str,
     default=None,
     metavar="PERCENT",
     callback=validate_crop_option,
@@ -128,7 +128,7 @@ def main(
     width,
     height,
     crop,
-    aspect,
+    aspect_ratio,
     output_format,
     black_and_white,
     thumbnail,
@@ -176,6 +176,7 @@ def main(
             or width is not None
             or height is not None
             or crop_percent is not None
+            or aspect_ratio is not None
         ):
             raise click.UsageError(
                 "Cannot use --thumb with other resize or crop options"
@@ -188,6 +189,7 @@ def main(
                 width is None,
                 height is None,
                 crop_percent is None,
+                aspect_ratio is None,
                 output_format is None,
                 not black_and_white,
                 not thumbnail,
@@ -200,7 +202,7 @@ def main(
             scale=scale,
             width=width,
             height=height,
-            crop_aspect=aspect,
+            crop_aspect=aspect_ratio,
             crop_percent=crop_percent,
             output_format=output_format,
             black_and_white=black_and_white,
