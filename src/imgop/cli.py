@@ -7,66 +7,24 @@ import click
 from .core import ImageProcessor
 
 
-def validate_aspect_ratio(ctx, param, value):
-    """Validate aspect ratio format."""
-    if value is None:
-        return value
-
-    if ":" not in value:
-        raise click.BadParameter("must be in format width:height (e.g., 16:9)")
-
-    try:
-        parts = value.split(":")
-        if len(parts) != 2:
-            raise ValueError
-        float(parts[0])
-        float(parts[1])
-    except ValueError:
-        raise click.BadParameter(
-            "must be in format width:height with numeric values (e.g., 16:9)"
-        ) from None
-
-    return value
-
-
 def validate_crop_option(ctx, param, value):
-    """Validate crop option - accepts either 'WIDTH HEIGHT' or 'ASPECT_RATIO'."""
+    """Validate crop option - accepts percentage value only."""
     if not value:
-        return None, None
+        return None
 
     value = value.strip()
 
-    # Check if it's an aspect ratio (contains colon)
-    if ":" in value:
-        try:
-            parts = value.split(":")
-            if len(parts) != 2:
-                raise ValueError
-            float(parts[0])
-            float(parts[1])
-            return None, value
-        except ValueError:
+    try:
+        percent = float(value)
+        if percent <= 0 or percent >= 100:
             raise click.BadParameter(
-                "Aspect ratio must be in format width:height with numeric values (e.g., 5:4, 16:9)"
-            ) from None
-
-    # Check if it's dimensions (space-separated width and height)
-    parts = value.split()
-    if len(parts) == 2:
-        try:
-            width = int(parts[0])
-            height = int(parts[1])
-            if width <= 0 or height <= 0:
-                raise click.BadParameter("Crop dimensions must be greater than 0")
-            return (width, height), None
-        except ValueError:
-            raise click.BadParameter(
-                "Dimensions must be two integers (e.g., '500 400')"
-            ) from None
-
-    raise click.BadParameter(
-        "Must be either 'WIDTH HEIGHT' (e.g., '500 400') or 'ASPECT_RATIO' (e.g., '16:9')"
-    )
+                "Crop percentage must be between 0 and 100",
+            )
+        return percent
+    except ValueError:
+        raise click.BadParameter(
+            "Must be a numeric percentage value (e.g., 50 for 50%)"
+        ) from None
 
 
 @click.command(
@@ -117,20 +75,23 @@ def validate_crop_option(ctx, param, value):
     help="Resize to specific height (width calculated automatically)",
 )
 @click.option(
-    "--size",
-    type=(int, int),
-    default=None,
-    metavar="WIDTH HEIGHT",
-    help="Resize to specific width and height",
-)
-@click.option(
     "-c",
     "--crop",
-    type=str,
+    type=int,
     default=None,
-    metavar="VALUE",
+    metavar="PERCENT",
     callback=validate_crop_option,
-    help="Crop to dimensions (e.g., -c '500 400') or aspect ratio (e.g., -c 16:9)",
+    help="Crop to percentage of original size (e.g., -c 50 for 50%)",
+)
+@click.option(
+    "-a",
+    "--aspect-ratio",
+    type=click.Choice(
+        ["16:9", "5:3", "4:3", "3:4", "3:2", "1:1"],
+        case_sensitive=False,
+    ),
+    default=None,
+    help="Crop to specific aspect ratio",
 )
 @click.option(
     "-f",
@@ -166,8 +127,8 @@ def main(
     scale,
     width,
     height,
-    size,
     crop,
+    aspect,
     output_format,
     black_and_white,
     thumbnail,
@@ -200,24 +161,21 @@ def main(
                 scale is not None,
                 width is not None,
                 height is not None,
-                size is not None,
             ]
         )
         if resize_options > 1:
             raise click.UsageError(
-                "Cannot use multiple resize options (scale, width, height, size) together"
+                "Cannot use multiple resize options (scale, width, height) together"
             )
 
-        # Unpack crop option (returns tuple of crop_size and crop_aspect)
-        crop_size, crop_aspect = crop if crop else (None, None)
+        # Crop option returns percentage value directly
+        crop_percent = crop
         # Check if thumbnail conflicts with transformation options
         if thumbnail and (
             scale is not None
             or width is not None
             or height is not None
-            or size is not None
-            or crop_size is not None
-            or crop_aspect is not None
+            or crop_percent is not None
         ):
             raise click.UsageError(
                 "Cannot use --thumb with other resize or crop options"
@@ -229,9 +187,7 @@ def main(
                 scale is None,
                 width is None,
                 height is None,
-                size is None,
-                crop_size is None,
-                crop_aspect is None,
+                crop_percent is None,
                 output_format is None,
                 not black_and_white,
                 not thumbnail,
@@ -244,9 +200,8 @@ def main(
             scale=scale,
             width=width,
             height=height,
-            size=size,
-            crop_size=crop_size,
-            crop_aspect=crop_aspect,
+            crop_aspect=aspect,
+            crop_percent=crop_percent,
             output_format=output_format,
             black_and_white=black_and_white,
             default_mode=use_default_mode,
