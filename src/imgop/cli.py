@@ -195,7 +195,7 @@ def main(
                 suffix="_md",
             )
         elif thumbnail:
-            # Thumbnail mode: scale by 25% and crop to 1:1 aspect with _sm suffix
+            # Thumbnail mode: crop to 1:1 aspect and scale by 25% with _sm suffix
             processor = ImageProcessor(
                 quality=quality,
                 scale=25,
