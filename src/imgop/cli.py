@@ -109,7 +109,7 @@ def validate_crop_option(ctx, param, value):
     default=False,
     help="Create square thumbnail (saved with _sm suffix)",
 )
-@click.version_option(version="0.7.0", prog_name="imgop")
+@click.version_option(version="0.7.2", prog_name="imgop")
 def main(
     path,
     output,
@@ -191,15 +191,15 @@ def main(
             # Default mode: scale by 50% with _md suffix
             processor = ImageProcessor(
                 quality=quality,
-                scale=50,
-                suffix="_md",
+                width=1200,
+                suffix="_lg",
             )
         elif thumbnail:
             # Thumbnail mode: crop to 1:1 aspect and scale by 25% with _sm suffix
             processor = ImageProcessor(
                 quality=quality,
-                scale=25,
                 crop_aspect="1:1",
+                width=250,
                 suffix="_sm",
             )
         else:
