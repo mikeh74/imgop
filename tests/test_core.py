@@ -21,13 +21,11 @@ class TestImageProcessor:
         """Test ImageProcessor initialization with default quality."""
         processor = ImageProcessor()
         assert processor.quality == 85
-        assert processor.thumbnail_quality == 70
 
     def test_init_custom_quality(self):
         """Test ImageProcessor initialization with custom quality."""
-        processor = ImageProcessor(quality=95, thumbnail_quality=80)
+        processor = ImageProcessor(quality=95)
         assert processor.quality == 95
-        assert processor.thumbnail_quality == 80
 
     def test_make_resized_large_image(self):
         """Test resizing a large image."""
@@ -77,8 +75,8 @@ class TestImageProcessor:
             # Create a test image
             img = Image.new("RGB", (100, 100), color="yellow")
 
-            # Save the image
-            processor.save_image(img, "test.jpg", temp_dir)
+            # Save the image (filename without extension)
+            processor.save_image(img, "test", temp_dir)
 
             # Check if file was created
             output_path = os.path.join(temp_dir, "test.jpg")
