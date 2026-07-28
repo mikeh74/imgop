@@ -46,10 +46,12 @@ pip install .
 pipx install git+https://github.com/mikeh74/imgop.git
 ```
 
-If you want HEIC support when installing from GitHub or from source, use:
+If you want HEIC support when installing from GitHub or from source, the most reliable approach is:
 
 ```bash
-pipx install "git+https://github.com/mikeh74/imgop.git#egg=imgop[heic]"
+git clone https://github.com/mikeh74/imgop.git
+cd imgop
+pipx install --force --editable '.[heic]'
 ```
 
 ## Usage

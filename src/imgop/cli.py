@@ -1,5 +1,6 @@
 """Command line interface for imgop."""
 
+import os
 import sys
 
 import click
@@ -219,7 +220,10 @@ def main(
 
         processor.process_path(path, output)
 
-        click.echo(f"✅ Successfully processed: {path}")
+        if os.path.isdir(path):
+            click.echo(f"✅ Finished processing directory: {path}")
+        else:
+            click.echo(f"✅ Successfully processed: {path}")
 
     except FileNotFoundError as e:
         click.echo(f"❌ Error: {e}", err=True)

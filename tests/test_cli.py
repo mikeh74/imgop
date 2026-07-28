@@ -127,3 +127,18 @@ class TestCLI:
             assert result.exit_code == 0
             assert os.path.exists(os.path.join(temp_dir, "test.jpg"))
             assert os.path.exists(os.path.join(temp_dir, "test.heic"))
+
+    def test_directory_processing_reports_progress(self):
+        """Test that processing a directory reports each file processed."""
+        runner = CliRunner()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            first_path = os.path.join(temp_dir, "first.jpg")
+            second_path = os.path.join(temp_dir, "second.png")
+            Image.new("RGB", (50, 50), color="blue").save(first_path)
+            Image.new("RGBA", (50, 50), color="red").save(second_path)
+
+            result = runner.invoke(main, [temp_dir, "-o", temp_dir])
+            assert result.exit_code == 0
+            assert "Processed: first.jpg" in result.output
+            assert "Processed: second.png" in result.output
+            assert "Finished processing directory" in result.output

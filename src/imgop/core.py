@@ -474,14 +474,20 @@ class ImageProcessor:
             outfile: path to output directory
         """
         supported_extensions = [".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"]
+        processed_count = 0
 
-        for filename in os.listdir(directory):
+        for filename in sorted(os.listdir(directory)):
             file_path = os.path.join(directory, filename)
 
             if os.path.isfile(file_path):
                 ext = os.path.splitext(file_path)[1].lower()
                 if ext in supported_extensions:
                     self.process_image(file_path, outfile)
+                    processed_count += 1
+                    print(f"Processed: {filename}")
+
+        if processed_count == 0:
+            print("No supported images found in directory")
 
     def process_path(self, input_path: str, output_path: str | None = None) -> None:
         """Process a file or directory of images.
