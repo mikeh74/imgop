@@ -88,9 +88,11 @@ def validate_crop_option(ctx, param, value):
     "-f",
     "--format",
     "output_format",
-    type=click.Choice(["jpeg", "jpg", "png", "webp"], case_sensitive=False),
+    type=click.Choice(
+        ["jpeg", "jpg", "png", "webp", "heic", "heif"], case_sensitive=False
+    ),
     default=None,
-    help="Output format (jpeg, png, or webp)",
+    help="Output format (jpeg, png, webp, or heic)",
 )
 @click.option(
     "--bw",

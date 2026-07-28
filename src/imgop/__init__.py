@@ -1,8 +1,8 @@
 """Image Fixer - A utility for resizing images and creating thumbnails."""
 
-__version__ = "0.7.2"
+__version__ = "0.8.0"
 __author__ = "Mike Horrocks"
-__email__ = "mikeh_74_@outlook.com"
+__email__ = "foxshack@outlook.com"
 
 from .core import ImageProcessor
 

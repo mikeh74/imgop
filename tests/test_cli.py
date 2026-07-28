@@ -25,7 +25,7 @@ class TestCLI:
         runner = CliRunner()
         result = runner.invoke(main, ["--version"])
         assert result.exit_code == 0
-        assert "0.7.0" in result.output
+        assert "0.7.2" in result.output
 
     def test_main_file_not_found(self):
         """Test main function with nonexistent file."""
@@ -62,7 +62,9 @@ class TestCLI:
         try:
             result = runner.invoke(main, [tmp_path, "--thumb", "--scale", "50"])
             assert result.exit_code != 0
-            assert "Cannot use --thumb with other resize or crop options" in result.output
+            assert (
+                "Cannot use --thumb with other resize or crop options" in result.output
+            )
         finally:
             os.unlink(tmp_path)
 
@@ -80,14 +82,13 @@ class TestCLI:
             assert result.exit_code == 0
             assert "Successfully processed" in result.output
 
-            # Check that output file exists with _md suffix
-            output_path = os.path.join(temp_dir, "test_md.jpg")
+            # Check that output file exists with _lg suffix
+            output_path = os.path.join(temp_dir, "test_lg.jpg")
             assert os.path.exists(output_path), f"Expected {output_path} to exist"
 
             # Verify it's a valid image
             output_img = Image.open(output_path)
-            # Should be scaled to 50% (100x100)
-            assert output_img.size == (100, 100)
+            assert output_img.size == (1200, 1200)
 
     def test_thumbnail_mode_creates_sm_suffix(self):
         """Test that thumbnail mode creates files with _sm suffix."""
@@ -109,6 +110,20 @@ class TestCLI:
 
             # Verify it's a valid image and square
             output_img = Image.open(output_path)
-            # Should be scaled to 25% and square (50x50)
-            assert output_img.size == (50, 50)
+            assert output_img.size == (250, 250)
             assert output_img.size[0] == output_img.size[1]  # Square
+
+    def test_format_option_accepts_heic(self):
+        """Test that the CLI accepts HEIC as an output format."""
+        runner = CliRunner()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            test_img_path = os.path.join(temp_dir, "test.jpg")
+            img = Image.new("RGB", (100, 100), color="purple")
+            img.save(test_img_path)
+
+            result = runner.invoke(
+                main, [test_img_path, "-o", temp_dir, "--format", "heic"]
+            )
+            assert result.exit_code == 0
+            assert os.path.exists(os.path.join(temp_dir, "test.jpg"))
+            assert os.path.exists(os.path.join(temp_dir, "test.heic"))

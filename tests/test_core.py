@@ -67,6 +67,21 @@ class TestImageProcessor:
         with pytest.raises(FileNotFoundError):
             processor.process_path("/nonexistent/path")
 
+    def test_save_image_as_heic(self):
+        """Test saving an image as HEIC when requested."""
+        processor = ImageProcessor(output_format="heic")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            img = Image.new("RGB", (100, 100), color="yellow")
+
+            processor.save_image(img, "test", temp_dir)
+
+            output_path = os.path.join(temp_dir, "test.heic")
+            assert os.path.exists(output_path)
+
+            saved_img = Image.open(output_path)
+            assert saved_img.size == (100, 100)
+
     def test_save_image(self):
         """Test saving an image."""
         processor = ImageProcessor()

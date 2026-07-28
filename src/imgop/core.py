@@ -5,6 +5,13 @@ from pathlib import Path
 
 from PIL import Image
 
+try:
+    from pillow_heif import register_heif_opener
+except ImportError:  # pragma: no cover - optional dependency
+    register_heif_opener = None
+else:
+    register_heif_opener()
+
 
 class ImageProcessor:
     """Main class for image processing operations."""
@@ -139,9 +146,16 @@ class ImageProcessor:
         if output_format is None:
             output_format = self.output_format
 
-        # Determine file extension - always add proper extension
         if output_format:
-            ext = "jpg" if output_format == "jpeg" else output_format
+            output_format = output_format.lower()
+
+        # Determine file extension - always add proper extension
+        if output_format in ["jpeg", "jpg"]:
+            ext = "jpg"
+        elif output_format in ["heic", "heif"]:
+            ext = "heic"
+        elif output_format:
+            ext = output_format
         else:
             # Default to jpg if no format specified
             ext = "jpg"
@@ -161,6 +175,12 @@ class ImageProcessor:
             img.save(path, format="PNG", optimize=True)
         elif output_format == "webp":
             img.save(path, format="WEBP", quality=quality)
+        elif output_format in ["heic", "heif"]:
+            if register_heif_opener is None:
+                raise RuntimeError(
+                    "HEIC/HEIF support requires the optional pillow-heif package"
+                )
+            img.save(path, format="HEIF", quality=quality)
         else:
             img.save(path, format="JPEG", quality=quality)
 

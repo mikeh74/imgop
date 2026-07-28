@@ -12,6 +12,20 @@ A Python utility for resizing images and creating thumbnails.
 
 ## Installation
 
+### Basic install
+
+```bash
+pip install imgop
+```
+
+### Install with HEIC support
+
+HEIC/HEIF output support is optional. Install the extra dependency when you want to write HEIC files:
+
+```bash
+pip install "imgop[heic]"
+```
+
 ### From Source
 
 ```bash
@@ -30,6 +44,12 @@ pip install .
 
 ```bash
 pipx install git+https://github.com/mikeh74/imgop.git
+```
+
+If you want HEIC support when installing from GitHub or from source, use:
+
+```bash
+pipx install "git+https://github.com/mikeh74/imgop.git#egg=imgop[heic]"
 ```
 
 ## Usage
